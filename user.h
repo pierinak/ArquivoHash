@@ -1,31 +1,64 @@
-#ifndef USER_H
-#define USER_H
+#ifndef USUARIOS_H
+#define USUARIOS_H
 
-#include <string>
-#include <unordered_map>
 #include <iostream>
+#include <cstring>
+#define TABLE_SIZE 11
 
 using namespace std;
 
-struct User {
-    string id;
-    string name;
-    string contact;
-
-    User() = default;
-    User(const string& id, const string& name, const string& contact)
-        : id(id), name(name), contact(contact) {}
+struct Usuario {
+    int id;
+    char nome[100];
+    char contato[100];
 };
 
-class UserCollection {
-public:
-    void addUser(const User& user);
-    void removeUser(const string& id);
-    User* searchUser(const string& id);
-    void listUsers() const;
+int hashUsuarios(int id);
+void initUsuarios(Usuario* usuarios);
+void insereUsuario(Usuario* usuarios, Usuario usuario, int index);
+Usuario* buscarUsuario(Usuario* usuarios, int id);
+void removerUsuario(Usuario* usuarios, int id);
+void mostrarUsuarios(Usuario* usuarios);
 
-private:
-    unordered_map<string, User> users;
-};
+int hashUsuarios(int id) {
+    return id % TABLE_SIZE;
+}
 
-#endif // USER_H
+void initUsuarios(Usuario* usuarios) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        usuarios[i].id = -1;
+        strcpy(usuarios[i].nome, "");
+        strcpy(usuarios[i].contato, "");
+    }
+}
+
+void insereUsuario(Usuario* usuarios, Usuario usuario, int index) {
+    usuarios[index] = usuario;
+}
+
+Usuario* buscarUsuario(Usuario* usuarios, int id) {
+    int index = hashUsuarios(id);
+    if (usuarios[index].id == id) {
+        return &usuarios[index];
+    }
+    return nullptr;
+}
+
+void removerUsuario(Usuario* usuarios, int id) {
+    int index = hashUsuarios(id);
+    if (usuarios[index].id == id) {
+        usuarios[index].id = -1;
+        strcpy(usuarios[index].nome, "");
+        strcpy(usuarios[index].contato, "");
+    }
+}
+
+void mostrarUsuarios(Usuario* usuarios) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        if (usuarios[i].id != -1) {
+            cout << "ID: " << usuarios[i].id << ", Nome: " << usuarios[i].nome << ", Contato: " << usuarios[i].contato << endl;
+        }
+    }
+}
+
+#endif
